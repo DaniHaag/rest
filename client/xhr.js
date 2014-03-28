@@ -10,7 +10,7 @@
 
 	define(function (require) {
 
-		var when, UrlBuilder, normalizeHeaderName, responsePromise, headerSplitRE;
+		var when, UrlBuilder, normalizeHeaderName, headerSplitRE;
 
 		when = require('when');
 		UrlBuilder = require('../UrlBuilder');
@@ -78,6 +78,14 @@
 				try {
 					client = response.raw = new XMLHttpRequest();
 					client.open(method, url, true);
+//					client.timeout = request.timeout || 0;
+//
+//					client.ontimeout = function () {
+//    					response.error = 'timeout';
+//    					response.status = {text: response.error};
+//    					return reject(response);
+//    				};
+
 
 					if (request.mixin) {
 						Object.keys(request.mixin).forEach(function (prop) {
@@ -105,16 +113,22 @@
 					client.onreadystatechange = function (/* e */) {
 						if (request.canceled) { return; }
 						if (client.readyState === (XMLHttpRequest.DONE || 4)) {
-							response.status = {
-								code: client.status,
-								text: client.statusText
-							};
-							response.headers = parseHeaders(client.getAllResponseHeaders());
-							response.entity = client.responseText;
+							try {
+								response.status = {
+									code: client.status,
+									text: client.statusText
+								};
+								response.headers = parseHeaders(client.getAllResponseHeaders());
+								response.entity = client.responseText;
 
-							if (response.status.code > 0) {
-								// check status code as readystatechange fires before error event
-								resolve(response);
+								if (response.status.code > 0) {
+									// check status code as readystatechange fires before error event
+									resolve(response);
+								}
+							} catch (e) {
+								//ie8 fires "Unspecified Error" in case of a timeout
+								response.error = e;
+								reject(response);
 							}
 						}
 					};

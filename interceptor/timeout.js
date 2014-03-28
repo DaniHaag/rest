@@ -31,7 +31,7 @@
 			},
 			request: function (request, config) {
 				var timeout, abortTrigger;
-				timeout = 'timeout' in request ? request.timeout : config.timeout;
+				timeout = 'timeout' in request ? request.timeout : request.timeout = config.timeout;
 				if (timeout <= 0) {
 					return request;
 				}
