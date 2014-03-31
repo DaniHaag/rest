@@ -78,13 +78,13 @@
 				try {
 					client = response.raw = new XMLHttpRequest();
 					client.open(method, url, true);
-//					client.timeout = request.timeout || 0;
-//
-//					client.ontimeout = function () {
-//    					response.error = 'timeout';
-//    					response.status = {text: response.error};
-//    					return reject(response);
-//    				};
+					client.timeout = request.timeout || 0;
+
+					client.ontimeout = function () {
+    					response.error = 'timeout';
+    					response.status = {text: response.error};
+    					return reject(response);
+    				};
 
 
 					if (request.mixin) {
